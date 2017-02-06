@@ -91,6 +91,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
     private static final Boolean DEFAULT_HARDWARE_BACK = true;
     private static final String USER_WIDE_VIEW_PORT = "useWideViewPort";
+    private static final String CUSTOM_USER_AGENT = "";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -452,6 +453,10 @@ public class InAppBrowser extends CordovaPlugin {
         });
     }
 
+    public void setCustomUserAgent(String userAgent){
+        CUSTOM_USER_AGENT = userAgent;
+    }
+
     /**
      * Checks to see if it is possible to go back one page in history, then does so.
      */
@@ -529,6 +534,8 @@ public class InAppBrowser extends CordovaPlugin {
         showZoomControls = true;
         openWindowHidden = false;
         mediaPlaybackRequiresUserGesture = false;
+
+        self = this;
 
         if (features != null) {
             Boolean show = features.get(LOCATION);
@@ -791,6 +798,10 @@ public class InAppBrowser extends CordovaPlugin {
                 }
                 if (appendUserAgent != null) {
                     settings.setUserAgentString(settings.getUserAgentString() + appendUserAgent);
+                }
+
+                if(CUSTOM_USER_AGENT != "") {
+                    settings.setUserAgentString(CUSTOM_USER_AGENT);
                 }
 
                 //Toggle whether this is enabled or not!
