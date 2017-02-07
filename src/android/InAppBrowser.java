@@ -195,6 +195,13 @@ public class InAppBrowser extends CordovaPlugin {
                         // load in InAppBrowser
                         else {
                             LOG.d(LOG_TAG, "loading in InAppBrowser");
+
+                            try {
+                                checkUserAgent(args.getString(2));
+                            }catch (JSONException e){
+                                LOG.e(LOG_TAG, "unexpected JSON exception", e);
+                            }
+
                             result = showWebPage(url, features);
                         }
                     }
@@ -207,18 +214,10 @@ public class InAppBrowser extends CordovaPlugin {
                     else {
                         LOG.d(LOG_TAG, "in blank");
 
-                        // set UserAgent if present in options
-                        if(args.optString(2).contains(CUSTOM_USER_AGENT)){
-                            StringTokenizer stringToken = new StringTokenizer(args.optString(2), ",");
-                            while(stringToken.hasMoreElements()){
-                                StringTokenizer option = new StringTokenizer(stringToken.nextToken(), "=");
-                                if (option.hasMoreElements()) {
-                                    String key = option.nextToken();
-                                    if(key == CUSTOM_USER_AGENT){
-                                        setCustomUserAgent(option.nextToken());
-                                    }
-                                }
-                            }
+                        try {
+                            checkUserAgent(args.getString(2));
+                        }catch (JSONException e){
+                            LOG.e(LOG_TAG, "unexpected JSON exception", e);
                         }
 
                         result = showWebPage(url, features);
@@ -496,6 +495,22 @@ public class InAppBrowser extends CordovaPlugin {
      */
     public boolean hardwareBack() {
         return hadwareBackButton;
+    }
+
+    private void checkUserAgent(String params){
+        // set UserAgent if present in options
+        if(params.contains(CUSTOM_USER_AGENT)){
+            StringTokenizer stringToken = new StringTokenizer(params, ",");
+            while (stringToken.hasMoreElements()){
+                StringTokenizer option = new StringTokenizer(stringToken.nextToken(), "=");
+                if (option.hasMoreElements()) {
+                    String key = option.nextToken();
+                    if(key.equals(CUSTOM_USER_AGENT)){
+                        setCustomUserAgent(option.nextToken());
+                    }
+                }
+            }
+        }
     }
 
     /**
