@@ -211,7 +211,7 @@ public class InAppBrowser extends CordovaPlugin {
                         if(args.optString(2).contains(CUSTOM_USER_AGENT)){
                             StringTokenizer stringToken = new StringTokenizer(args.optString(2), ",");
                             while(stringToken.hasMoreElements()){
-                                StringTokenizer option = new StringTokenizer(stringToken..nextToken(), "=");
+                                StringTokenizer option = new StringTokenizer(stringToken.nextToken(), "=");
                                 if (option.hasMoreElements()) {
                                     String key = option.nextToken();
                                     if(key == CUSTOM_USER_AGENT){
@@ -550,8 +550,6 @@ public class InAppBrowser extends CordovaPlugin {
         showZoomControls = true;
         openWindowHidden = false;
         mediaPlaybackRequiresUserGesture = false;
-
-        self = this;
 
         if (features != null) {
             Boolean show = features.get(LOCATION);
