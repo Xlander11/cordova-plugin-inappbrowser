@@ -91,7 +91,7 @@ public class InAppBrowser extends CordovaPlugin {
     private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
     private static final Boolean DEFAULT_HARDWARE_BACK = true;
     private static final String USER_WIDE_VIEW_PORT = "useWideViewPort";
-    private static final String CUSTOM_USER_AGENT = "";
+    private static final String CUSTOM_USER_AGENT = "userAgent";
 
     private InAppBrowserDialog dialog;
     private WebView inAppWebView;
@@ -106,6 +106,7 @@ public class InAppBrowser extends CordovaPlugin {
     private boolean mediaPlaybackRequiresUserGesture = false;
     private boolean shouldPauseInAppBrowser = false;
     private boolean useWideViewPort = true;
+    private String userAgent = "";
     private ValueCallback<Uri> mUploadCallback;
     private ValueCallback<Uri[]> mUploadCallbackLollipop;
     private final static int FILECHOOSER_REQUESTCODE = 1;
@@ -119,7 +120,7 @@ public class InAppBrowser extends CordovaPlugin {
      * @param callbackContext the callbackContext used when calling back into JavaScript.
      * @return A PluginResult object with a status and message.
      */
-    public boolean execute(String action, CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
+    public boolean execute(String action, final CordovaArgs args, final CallbackContext callbackContext) throws JSONException {
         if (action.equals("open")) {
             this.callbackContext = callbackContext;
             final String url = args.getString(0);
@@ -205,6 +206,21 @@ public class InAppBrowser extends CordovaPlugin {
                     // BLANK - or anything else
                     else {
                         LOG.d(LOG_TAG, "in blank");
+
+                        // set UserAgent if present in options
+                        if(args.optString(2).contains(CUSTOM_USER_AGENT)){
+                            StringTokenizer stringToken = new StringTokenizer(args.optString(2), ",");
+                            while(stringToken.hasMoreElements()){
+                                StringTokenizer option = new StringTokenizer(stringToken..nextToken(), "=");
+                                if (option.hasMoreElements()) {
+                                    String key = option.nextToken();
+                                    if(key == CUSTOM_USER_AGENT){
+                                        setCustomUserAgent(option.nextToken());
+                                    }
+                                }
+                            }
+                        }
+
                         result = showWebPage(url, features);
                     }
 
@@ -454,7 +470,7 @@ public class InAppBrowser extends CordovaPlugin {
     }
 
     public void setCustomUserAgent(String userAgent){
-        CUSTOM_USER_AGENT = userAgent;
+        this.userAgent = userAgent;
     }
 
     /**
@@ -800,8 +816,8 @@ public class InAppBrowser extends CordovaPlugin {
                     settings.setUserAgentString(settings.getUserAgentString() + appendUserAgent);
                 }
 
-                if(CUSTOM_USER_AGENT != "") {
-                    settings.setUserAgentString(CUSTOM_USER_AGENT);
+                if(userAgent != "") {
+                    settings.setUserAgentString(userAgent);
                 }
 
                 //Toggle whether this is enabled or not!
